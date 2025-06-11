@@ -81,14 +81,14 @@ export class FileAppender<TNameA extends string> extends Appender<
 
     stream.on('error', (err: Error) => {
       console.error(
-        'log4js.fileAppender - Writing to file %s, error happened ',
+        'log4ts.fileAppender - Writing to file %s, error happened ',
         this.config.filename,
         err
       )
     })
 
     stream.on('drain', () => {
-      // process.emit('log4js:pause', false)
+      // process.emit('log4ts:pause', false)
       console.log('zzz-drain')
     })
 
@@ -108,7 +108,7 @@ export class FileAppender<TNameA extends string> extends Appender<
     //   })
     // }
     // if (!this.writer.write(this.layout(loggingEvent, this.config.timezoneOffset) + eol, 'utf8')) {
-    //   process.emit('log4js:pause', true)
+    //   process.emit('log4ts:pause', true)
     // }
 
     this.writer.write(data + eol, 'utf8')
