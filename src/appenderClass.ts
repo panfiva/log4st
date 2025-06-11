@@ -5,6 +5,8 @@ import { getEventBus } from './eventBus'
 
 type WriteMethod<D> = (data: D) => Promise<void> | void
 
+export type ShutdownCb = (() => void) | (() => Promise<void>)
+
 /**
  * class that writes logs to the destination repository
  */
@@ -25,7 +27,9 @@ export abstract class Appender<
   }
 
   /** function executed on appender shutdown */
-  shutdown: () => Promise<void> | void = () => {}
+  shutdown: (cb?: ShutdownCb) => Promise<void> | void = (cb) => {
+    if (cb) cb()
+  }
 
   attachToLogger = <
     TLoggerName extends string,

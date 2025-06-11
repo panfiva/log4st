@@ -1,4 +1,4 @@
-import { Appender } from '../appenderClass'
+import { Appender, ShutdownCb } from '../appenderClass'
 
 import { RollingFileWriteStream } from '../rollingFileStream/RollingFileWriteStream'
 import * as path from 'path'
@@ -125,12 +125,12 @@ export class FileAppender<TNameA extends string> extends Appender<
     this.reopen()
   }
 
-  shutdown = () => {
+  shutdown = (cb?: ShutdownCb) => {
     sighupListeners.delete(this)
     if (sighupListeners.size === 0 && mainSighupListenerStarted) {
       process.removeListener('SIGHUP', mainSighupHandler)
       mainSighupListenerStarted = false
     }
-    this.writer.end('', 'utf-8')
+    this.writer.end('', 'utf-8', cb)
   }
 }
