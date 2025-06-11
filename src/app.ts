@@ -1,4 +1,4 @@
-import { LevelRegistry } from './levelRegistry'
+import { getLevelRegistry } from './levelRegistry'
 import { createLogger } from './logger'
 import type { LevelName } from './types'
 import { FileAppender } from './appenders/fileAppender'
@@ -13,7 +13,9 @@ type NumberListLoggerData = number[]
 // Logger will only accept 1 string parameter
 type StringLoggerData = [string]
 
-const levelRegistry = new LevelRegistry<LevelNames>({
+const levelRegistry = getLevelRegistry<LevelNames>()
+
+levelRegistry.addLevels({
   INFO: { value: 20002, color: 'green' },
   TEST: { value: 20001, color: 'green' },
 })
@@ -42,14 +44,12 @@ testFileAppender.attachToLogger<LoggerNames, LevelNames, StringLoggerData>(
 )
 
 const numberLogger = createLogger<NumberListLoggerData, LevelNames, LoggerNames>({
-  levelRegistry,
   loggerName: 'NumberListLogger',
   level: 'DEBUG',
   // useCallStack: true,
 })
 
 const stringLogger = createLogger<StringLoggerData, LevelNames, LoggerNames>({
-  levelRegistry,
   loggerName: 'StringLogger',
   level: 'DEBUG',
   // useCallStack: true,

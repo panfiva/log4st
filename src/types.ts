@@ -1,5 +1,4 @@
 import type { Level } from './level'
-import type { LevelRegistry } from './levelRegistry'
 
 /** Standard level name */
 export type LevelName =
@@ -104,6 +103,4 @@ export type LoggerProps<TLevelName extends LevelName, TName extends string> = {
 
   /** indicates if callstack should be recorded  */
   useCallStack?: boolean
-
-  levelRegistry: LevelRegistry<TLevelName>
 }

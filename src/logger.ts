@@ -4,7 +4,7 @@ const debug = debugLib('log4ts:logger')
 import { LoggingEvent } from './loggingEvent'
 import type { LevelParam, LevelName, LoggerArg, LoggerProps } from './types'
 import type { Level } from './level'
-import { LevelRegistry } from './levelRegistry'
+import { getLevelRegistry } from './levelRegistry'
 import { getEventBus } from './eventBus'
 import { defaultParseCallStack, ParseCallStackFunction } from './defaultParseCallStack'
 
@@ -39,7 +39,9 @@ export const createLogger = <
     TName
   >
 
-  for (const level of logger.levelRegistry.levelsArray) {
+  const levelRegistry = getLevelRegistry<TLevelName>()
+
+  for (const level of levelRegistry.levelsArray) {
     const levelName: LoggerMethodName<TLevelName> = level.levelName.toLowerCase() as any
 
     const loggerRef = logger as LoggerMethods<TLevelName, TData>
@@ -74,12 +76,6 @@ class LoggerClass<
   /** logger name */
   loggerName: TName
 
-  /**
-   * log levels defined in the logger;
-   * includes all standard levels plus custom levels
-   */
-  levelRegistry: LevelRegistry<TLevelName>
-
   /** appenders attached */
   // private appenders: Appender<TLevelName>[] = []
 
@@ -97,27 +93,30 @@ class LoggerClass<
   constructor(param: LoggerProps<TLevelName, TName>) {
     this.context = {}
 
+    const levelRegistry = getLevelRegistry<TLevelName>()
+
     this.loggerName = param.loggerName
-    this.levelRegistry = param.levelRegistry
-    this._level =
-      (param.level && this.levelRegistry.getLevel(param.level)) ??
-      this.levelRegistry.getLevel('INFO' as TLevelName)!
+
+    const level = levelRegistry.getLevel(param.level)
+
+    if (!level) throw new Error(`Invalid level parameter: ${JSON.stringify(param.level)}`)
+
+    this._level = level
     this.useCallStack = param.useCallStack ?? false
   }
 
   get level(): Level<TLevelName> {
-    const ret = this.levelRegistry.getLevel(
-      this._level,
-      this.levelRegistry.levelsDict['OFF' as TLevelName]
-    )
+    const levelRegistry = getLevelRegistry<TLevelName>()
+    const ret = levelRegistry.getLevel(this._level, levelRegistry.levelsDict['OFF' as TLevelName])
     return ret
   }
 
-  set level(level) {
-    const v = this.levelRegistry.getLevel(level)
-    if (!v) console.warn(`level ${JSON.stringify(level)} is not configured`)
-    this._level = v ?? this.level
-  }
+  // set level(level) {
+  //   const levelRegistry = getLevelRegistry<TLevelName>()
+  //   const v = levelRegistry.getLevel(level)
+  //   if (!v) console.warn(`level ${JSON.stringify(level)} is not configured`)
+  //   this._level = v ?? this.level
+  // }
 
   /**
    * By default, logger will skip all stack lines between actual Error and logger function call
@@ -139,7 +138,8 @@ class LoggerClass<
   }
 
   log(level: LevelParam<TLevelName>, ...args: TData) {
-    const logLevel = this.levelRegistry.getLevel(level)
+    const levelRegistry = getLevelRegistry<TLevelName>()
+    const logLevel = levelRegistry.getLevel(level)
 
     if (!logLevel) {
       console.error('Cannot send event')

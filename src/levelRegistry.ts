@@ -1,7 +1,7 @@
 import { Level } from './level'
 import type { LevelName, LevelParam, LevelConstructorProps } from './types'
 
-export class LevelRegistry<T extends LevelName = LevelName> {
+class LevelRegistry<T extends LevelName = LevelName> {
   levelsDict: Record<T, Level<T>> = {} as any // constructor will
   levelsArray: Array<Level<T>> = []
 
@@ -58,7 +58,7 @@ export class LevelRegistry<T extends LevelName = LevelName> {
         const levelName = levelKey.toUpperCase() as T
         const levelConfig = levelsParam[levelKey]!
 
-        const level = new Level<T>(levelConfig.value, levelName, levelConfig.color, this)
+        const level = new Level<T>(levelConfig.value, levelName, levelConfig.color)
 
         this.levelsDict[levelName] = level
         const existingLevelIndex = this.levelsArray.findIndex((lvl) => lvl.levelName === levelName)
@@ -72,4 +72,10 @@ export class LevelRegistry<T extends LevelName = LevelName> {
       this.levelsArray.sort((a, b) => a.level - b.level)
     }
   }
+}
+
+const levelRegistry = new LevelRegistry()
+
+export function getLevelRegistry<T extends LevelName = LevelName>(): LevelRegistry<T> {
+  return levelRegistry as any
 }

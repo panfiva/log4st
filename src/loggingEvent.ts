@@ -1,5 +1,7 @@
 import flatted from 'flatted'
 import type { LevelParam, LevelName, CallStack, LoggerArg } from './types'
+import { getLevelRegistry } from './levelRegistry'
+import type { Level } from 'level'
 
 import { pick, omitBy } from 'lodash'
 
@@ -69,12 +71,13 @@ type LoggingEventProps<T extends LevelName, TData extends Array<LoggerArg>> = {
 }
 
 export class LoggingEvent<TLevelName extends LevelName, TData extends Array<LoggerArg>> {
-  payload: LoggingEventProps<TLevelName, TData> & {
+  payload: Omit<LoggingEventProps<TLevelName, TData>, 'level'> & {
     startTime: Date
+    level: Level<TLevelName>
   } = {} as any
 
   constructor(param: Omit<LoggingEventProps<TLevelName, TData>, 'pid'>) {
-    const { loggerName, level, data, context, location, error } = param
+    const { loggerName, level, data, context, location, error, cluster } = param
 
     let locationVal: CallStack | undefined = undefined
 
@@ -86,11 +89,16 @@ export class LoggingEvent<TLevelName extends LevelName, TData extends Array<Logg
       locationVal = omitBy(pick(location, keys), (v) => v === undefined)
     }
 
+    const levelRegistry = getLevelRegistry<TLevelName>()
+
+    // level should always be here if we use types properly
+    const levelInstance = levelRegistry.getLevel(level)!
+
     this.payload = {
       startTime: new Date(),
       loggerName: loggerName,
       data: data,
-      level: level,
+      level: levelInstance,
       context: { ...context },
       pid: process.pid,
       /**
