@@ -4,7 +4,7 @@ const debug = debugLib('log4ts:logger')
 import { LoggingEvent } from './loggingEvent'
 import type { LevelParam, LevelName, LoggerArg, LoggerProps } from './types'
 import type { Level } from './level'
-import { getLevelRegistry } from './levelRegistry'
+import { getLevelRegistry } from './level'
 import { getEventBus } from './eventBus'
 import { defaultParseCallStack, ParseCallStackFunction } from './defaultParseCallStack'
 

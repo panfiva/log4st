@@ -1,4 +1,4 @@
-import { getLevelRegistry } from './levelRegistry'
+import { getLevelRegistry } from './level'
 import { createLogger } from './logger'
 import type { LevelName } from './types'
 import { FileAppender } from './appenders/fileAppender'
