@@ -5,8 +5,8 @@ This project is inspired by [log4js-node](https://log4js-node.github.io/log4js-n
 Key differences:
 
 - Migrated from JavaScript to TypeScript
-- Migraged functions and global variables to classes
-- Do not use configation to configure the project - instanciate class instances instead
+- Migrated functions and global variables to classes
+- Do not use configuration to configure the project - instantiate class instances instead
 - Allows multiple loggers in a project
 
 ## Contributing
