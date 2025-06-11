@@ -1,7 +1,5 @@
-import { getLevelRegistry } from './level'
-import { createLogger } from './logger'
+import { getLevelRegistry, createLogger, FileAppender } from './'
 import type { LevelName } from './types'
-import { FileAppender } from './appenders/fileAppender'
 
 type LevelNames = LevelName | 'TEST'
 type LoggerNames = 'NumberListLogger' | 'StringLogger'
