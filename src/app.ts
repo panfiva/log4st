@@ -44,13 +44,11 @@ testFileAppender.attachToLogger<LoggerNames, LevelNames, StringLoggerData>(
 const numberLogger = createLogger<NumberListLoggerData, LevelNames, LoggerNames>({
   loggerName: 'NumberListLogger',
   level: 'DEBUG',
-  // useCallStack: true,
 })
 
 const stringLogger = createLogger<StringLoggerData, LevelNames, LoggerNames>({
   loggerName: 'StringLogger',
   level: 'DEBUG',
-  // useCallStack: true,
 })
 
 numberLogger.debug(1, 2, 3)

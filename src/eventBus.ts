@@ -90,7 +90,11 @@ class EventBus {
   }
 
   private sendToLlisteners = (logEvent: LoggingEvent<any, any>) => {
-    const listeners = this.listeners.filter((v) => v.loggerName === logEvent.payload.loggerName)
+    const listeners = this.listeners.filter(
+      (v) =>
+        v.loggerName === logEvent.payload.loggerName &&
+        logEvent.payload.level.isGreaterThanOrEqualTo(v.levelName)
+    )
 
     listeners.forEach((conf) => conf.listener(logEvent))
   }

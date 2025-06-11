@@ -33,7 +33,15 @@ export abstract class Appender<
     TData extends Array<LoggerArg>,
   >(
     loggerName: TLoggerName,
+
+    /**
+     * controls what appenders will receive message sent by a logger
+     *
+     * this is different from Logger.level property that controls what messages are sent to appenders
+     */
     levelName: TLevelName,
+
+    /** callback function that transforms event payload to format accepted by appender  */
     transformer: (
       event: LoggingEvent<TLoggerName, TData>,
       appenderName: TNameA,

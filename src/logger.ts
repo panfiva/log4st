@@ -76,9 +76,6 @@ class LoggerClass<
   /** logger name */
   loggerName: TName
 
-  /** appenders attached */
-  // private appenders: Appender<TLevelName>[] = []
-
   /** default log level for attached appenders */
   private _level: Level<TLevelName>
 

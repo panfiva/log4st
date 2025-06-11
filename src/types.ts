@@ -96,8 +96,10 @@ export type LoggerProps<TLevelName extends LevelName, TName extends string> = {
   /** logger name */
   loggerName: TName
 
-  /** default level for attached appenders
-   * will default to `INFO`
+  /**
+   * controls what messages will be sent to appenders using message severity
+   *
+   * Once requests are sent, they are received by appenders using Appender - Logger - Level mapping (see Appender.attachToLogger function)
    */
   level: LevelParam<TLevelName>
 
