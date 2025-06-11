@@ -39,7 +39,7 @@ export const createLogger = <
     TName
   >
 
-  for (const level of logger.levels.levelsArray) {
+  for (const level of logger.levelRegistry.levelsArray) {
     const levelName: LoggerMethodName<TLevelName> = level.levelName.toLowerCase() as any
 
     const loggerRef = logger as LoggerMethods<TLevelName, TData>
@@ -78,7 +78,7 @@ class LoggerClass<
    * log levels defined in the logger;
    * includes all standard levels plus custom levels
    */
-  levels: LevelRegistry<TLevelName>
+  levelRegistry: LevelRegistry<TLevelName>
 
   /** appenders attached */
   // private appenders: Appender<TLevelName>[] = []
@@ -98,20 +98,23 @@ class LoggerClass<
     this.context = {}
 
     this.loggerName = param.loggerName
-    this.levels = param.levelRegistry
+    this.levelRegistry = param.levelRegistry
     this._level =
-      (param.level && this.levels.getLevel(param.level)) ??
-      this.levels.getLevel('INFO' as TLevelName)!
+      (param.level && this.levelRegistry.getLevel(param.level)) ??
+      this.levelRegistry.getLevel('INFO' as TLevelName)!
     this.useCallStack = param.useCallStack ?? false
   }
 
   get level(): Level<TLevelName> {
-    const ret = this.levels.getLevel(this._level, this.levels.levelsDict['OFF' as TLevelName])
+    const ret = this.levelRegistry.getLevel(
+      this._level,
+      this.levelRegistry.levelsDict['OFF' as TLevelName]
+    )
     return ret
   }
 
   set level(level) {
-    const v = this.levels.getLevel(level)
+    const v = this.levelRegistry.getLevel(level)
     if (!v) console.warn(`level ${JSON.stringify(level)} is not configured`)
     this._level = v ?? this.level
   }
@@ -136,7 +139,7 @@ class LoggerClass<
   }
 
   log(level: LevelParam<TLevelName>, ...args: TData) {
-    const logLevel = this.levels.getLevel(level)
+    const logLevel = this.levelRegistry.getLevel(level)
 
     if (!logLevel) {
       console.error('Cannot send event')
