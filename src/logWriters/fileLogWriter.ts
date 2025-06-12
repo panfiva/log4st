@@ -89,7 +89,6 @@ export class FileLogWriter<TNameA extends string> extends LogWriter<
 
     stream.on('drain', () => {
       // process.emit('log4ts:pause', false)
-      console.log('zzz-drain')
     })
 
     return stream
