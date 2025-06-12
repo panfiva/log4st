@@ -5,7 +5,7 @@ const debug = debugLib('log4ts:appender:example')
 
 export type ExampleAppenderConfig = { example: string }
 
-export class FileAppender<
+export class ExampleAppender<
   TFormattedData,
   TConfigA extends Record<string, any>,
   TNameA extends string,
@@ -17,7 +17,7 @@ export class FileAppender<
 
     this.config = config
 
-    debug(`Creating file appender ${JSON.stringify(this.config)}`)
+    debug(`Creating example appender ${JSON.stringify(this.config)}`)
   }
 
   write = (data: TFormattedData) => {
