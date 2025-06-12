@@ -1,24 +1,24 @@
-import { Appender, ShutdownCb } from '../appenderClass'
+import { LogWriter, ShutdownCb } from '../logWriterClass'
 
 import { RollingFileWriteStream } from '../rollingFileStream/RollingFileWriteStream'
 import * as path from 'path'
 import * as os from 'os'
 
 import debugLib from 'debug'
-const debug = debugLib('log4ts:appender:file')
+const debug = debugLib('log4ts:logWriter:file')
 
 const eol = os.EOL
 
 let mainSighupListenerStarted = false
-const sighupListeners = new Set<FileAppender<any>>()
+const sighupListeners = new Set<FileLogWriter<any>>()
 
 function mainSighupHandler() {
-  sighupListeners.forEach((app) => {
-    app.sighupHandler()
+  sighupListeners.forEach((logWriter) => {
+    logWriter.sighupHandler()
   })
 }
 
-export type FileAppenderConfig = {
+export type FileLogWriterConfig = {
   filename: string
   maxLogSize?: number
   backups?: number
@@ -26,18 +26,18 @@ export type FileAppenderConfig = {
   encoding?: BufferEncoding
 }
 
-/** data accepted by appender */
-type FileAppenderData = string
+/** data accepted by logWriter */
+type FileLogWriterData = string
 
-export class FileAppender<TNameA extends string> extends Appender<
-  FileAppenderData,
-  FileAppenderConfig,
+export class FileLogWriter<TNameA extends string> extends LogWriter<
+  FileLogWriterData,
+  FileLogWriterConfig,
   TNameA
 > {
-  config: Required<FileAppenderConfig>
+  config: Required<FileLogWriterConfig>
   private writer: RollingFileWriteStream
 
-  constructor(name: TNameA, config: FileAppenderConfig) {
+  constructor(name: TNameA, config: FileLogWriterConfig) {
     super(name)
 
     if (typeof config.filename !== 'string' || config.filename.length === 0) {
@@ -59,7 +59,7 @@ export class FileAppender<TNameA extends string> extends Appender<
       encoding: config.encoding ?? 'utf-8',
     }
 
-    debug(`Creating file appender ${JSON.stringify(this.config)}`)
+    debug(`Creating file logWriter ${JSON.stringify(this.config)}`)
 
     this.writer = this.openStream()
 
@@ -81,7 +81,7 @@ export class FileAppender<TNameA extends string> extends Appender<
 
     stream.on('error', (err: Error) => {
       console.error(
-        'log4ts.fileAppender - Writing to file %s, error happened ',
+        'log4ts.fileLogWriter - Writing to file %s, error happened ',
         this.config.filename,
         err
       )
@@ -95,7 +95,7 @@ export class FileAppender<TNameA extends string> extends Appender<
     return stream
   }
 
-  write = (data: FileAppenderData) => {
+  write = (data: FileLogWriterData) => {
     if (!this.writer.writable) {
       return
     }

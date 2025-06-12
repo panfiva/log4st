@@ -1,11 +1,11 @@
 import debugLib from 'debug'
 const debug = debugLib('log4ts:app')
 
-import { createLogger, SplunkHecAppender, SplunkData, shutdown, LevelName } from './'
+import { createLogger, SplunkHecLogWriter, SplunkData, shutdown, LevelName } from './'
 
 type LevelNames = LevelName
 type LoggerNames = 'SplunkLogger'
-type AppenderNames = 'SplunkAppender'
+type LogWriterNames = 'SplunkLogWriter'
 
 type Payload = {
   origin: 'user' | 'service'
@@ -25,14 +25,14 @@ type Payload = {
     }
 )
 
-type PayloadAppender = {
+type PayloadLogWriter = {
   severity: LevelNames
   platform: 'v2'
   loggerName: string
-  appenderName: string
+  logWriterName: string
 }
 
-type SplunkAppenderData = SplunkData<Payload & PayloadAppender>
+type SplunkLogWriterData = SplunkData<Payload & PayloadLogWriter>
 
 type SplunkLoggerData = Omit<SplunkData<Payload>, 'index' | 'time' | 'sourcetype' | 'event'> &
   Payload
@@ -42,29 +42,29 @@ type SplunkLoggerParams = [index: string, event: SplunkLoggerData]
 const baseURL: string = process.env.SPLUNK_COLLECTOR_URL!
 const token: string = process.env.SPLUNK_HEC_TOKEN!
 
-const appender = new SplunkHecAppender<SplunkAppenderData, AppenderNames>('SplunkAppender', {
+const logWriter = new SplunkHecLogWriter<SplunkLogWriterData, LogWriterNames>('SplunkLogWriter', {
   baseURL,
   token,
 })
 
-appender.attachToLogger<LoggerNames, LevelNames, SplunkLoggerParams>(
+logWriter.attachToLogger<LoggerNames, LevelNames, SplunkLoggerParams>(
   'SplunkLogger',
   'DEBUG',
-  (event, appenderName, _appenderConfig) => {
+  (event, logWriterName, _logWriterConfig) => {
     const index = event.payload.data[0]
     const data = event.payload.data[1]
 
     const { host, source, ...restData } = data
 
-    const eventPayload: Payload & PayloadAppender = {
+    const eventPayload: Payload & PayloadLogWriter = {
       ...restData,
       severity: event.payload.level.levelName,
       loggerName: event.payload.loggerName,
-      appenderName,
+      logWriterName,
       platform: 'v2',
     }
 
-    const ret: SplunkAppenderData = {
+    const ret: SplunkLogWriterData = {
       event: eventPayload,
       host,
       source,

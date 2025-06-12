@@ -4,7 +4,7 @@ const debug = debugLib('log4ts:clustering')
 import { Worker, Cluster } from 'cluster'
 import type { LoggingEvent } from './loggingEvent'
 import type { LevelName } from './types'
-import type { Appender, ShutdownCb } from './appenderClass'
+import type { LogWriter, ShutdownCb } from './logWriterClass'
 
 let _cluster: Cluster | false | undefined = undefined
 let _eventBus: EventBus | undefined = undefined
@@ -60,7 +60,7 @@ export async function shutdown(callback?: ShutdownCb): Promise<void> {
 class EventBus {
   private listeners: EventListenerConfig<any, any>[] = []
 
-  private appenders: Map<string, Appender<any, any, any>> = new Map()
+  private logWriters: Map<string, LogWriter<any, any, any>> = new Map()
 
   cluster: Cluster | false
 
@@ -138,15 +138,15 @@ class EventBus {
 
   /** adds message listener */
   public addMessageListener(
-    conf: EventListenerConfig<any, any> & { appender: Appender<any, any, any> }
+    conf: EventListenerConfig<any, any> & { logWriter: LogWriter<any, any, any> }
   ) {
-    const { appender, levelName, listener, loggerName } = conf
+    const { logWriter, levelName, listener, loggerName } = conf
     this.listeners.push({ levelName, listener, loggerName })
-    const registered = this.appenders.get(conf.appender.name)
-    if (registered && registered !== appender) {
-      throw new Error('Duplicate appender name detected')
+    const registered = this.logWriters.get(conf.logWriter.name)
+    if (registered && registered !== logWriter) {
+      throw new Error('Duplicate logWriter name detected')
     }
-    this.appenders.set(conf.appender.name, appender)
+    this.logWriters.set(conf.logWriter.name, logWriter)
   }
 
   public async shutdown(callback?: ShutdownCb) {
@@ -154,32 +154,30 @@ class EventBus {
 
     this.enabled = false
 
-    // count of appenders
+    const logWritersToCheck = Array.from(this.logWriters.values())
 
-    const appendersToCheck = Array.from(this.appenders.values())
+    const logWriters = logWritersToCheck.length
 
-    const appenders = appendersToCheck.length
-
-    if (appenders === 0) {
-      debug('No appenders to shutdown')
+    if (logWriters === 0) {
+      debug('No log writers to shutdown')
       if (callback) callback()
     }
 
     let completed: number = 0
     let error: Error | undefined = undefined
 
-    debug(`Found ${appenders} appenders to shutdown`)
+    debug(`Found ${logWriters} log writers to shutdown`)
 
     async function complete(err?: Error) {
       error = error ?? err
       completed += 1
-      debug(`Appender shutdowns complete: ${completed} / ${appenders}`)
-      if (completed >= appenders) {
+      debug(`LogWriter shutdowns complete: ${completed} / ${logWriters}`)
+      if (completed >= logWriters) {
         debug('All shutdown functions completed.')
         if (callback) callback(error)
       }
     }
 
-    appendersToCheck.forEach((v) => v.shutdown(complete))
+    logWritersToCheck.forEach((v) => v.shutdown(complete))
   }
 }

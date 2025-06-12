@@ -43,7 +43,7 @@
   "eslint.validate": ["javascript", "typescript"],
   "cSpell.words": [
     "allexport",
-    "appender",
+    "logWriter",
     "deserialize",
     "listeners",
     "multiprocess",

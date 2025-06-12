@@ -1,4 +1,4 @@
-import { Appender, ShutdownCb } from '../appenderClass'
+import { LogWriter, ShutdownCb } from '../logWriterClass'
 
 import axios from 'axios'
 import https from 'https'
@@ -8,9 +8,9 @@ const agent = new https.Agent({
 })
 
 import debugLib from 'debug'
-const debug = debugLib('log4ts:appender:splunkHec')
+const debug = debugLib('log4ts:logWriter:splunkHec')
 
-export type SplunkHecAppenderConfig = {
+export type SplunkHecLogWriterConfig = {
   /**
    * base URL for Splunk
    * @example 'https://splunk.demo.com:8088'
@@ -29,12 +29,12 @@ export type SplunkData<T extends Record<string, any>> = {
   event: T
 }
 
-type TConfigA = SplunkHecAppenderConfig
+type TConfigA = SplunkHecLogWriterConfig
 
-export class SplunkHecAppender<
+export class SplunkHecLogWriter<
   TFormattedData extends SplunkData<any>,
   TNameA extends string,
-> extends Appender<TFormattedData, TConfigA, TNameA> {
+> extends LogWriter<TFormattedData, TConfigA, TNameA> {
   config: TConfigA
 
   private activeWrites = new Set<object>()
@@ -44,14 +44,14 @@ export class SplunkHecAppender<
 
     this.config = config
 
-    debug(`Creating splunk HEC appender '${name}' for ${this.config.baseURL}`)
+    debug(`Creating splunk HEC logWriter '${name}' for ${this.config.baseURL}`)
   }
 
   private _write = async (data: TFormattedData) => {
     const payload = { ...data }
     if (!payload.source.startsWith('http:')) payload.source = `http:${payload.source}`
 
-    debug(`Appender '${this.name}' writing data`)
+    debug(`LogWriter '${this.name}' writing data`)
     const ret = await axios.post('/services/collector/event', payload, {
       baseURL: this.config.baseURL,
       headers: {
@@ -66,20 +66,20 @@ export class SplunkHecAppender<
   }
 
   write = (data: TFormattedData) => {
-    debug(`Appender '${this.name}' data received`)
+    debug(`LogWriter '${this.name}' data received`)
 
     const pointer = {}
     this.activeWrites.add(pointer)
     this._write(data)
       .catch((err) => {
         debug(
-          `Error in SplunkHecAppender.write: ${err.status}`,
+          `Error in SplunkHecLogWriter.write: ${err.status}`,
           err.response.statusText,
           err.response.data
         )
       })
       .finally(() => {
-        debug(`Appender '${this.name}' write complete`)
+        debug(`LogWriter '${this.name}' write complete`)
         this.activeWrites.delete(pointer)
       })
   }

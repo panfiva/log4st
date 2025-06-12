@@ -75,16 +75,16 @@ export type TransformerFn<
   T extends LevelName = LevelName,
   // Logger data shape
   D extends Array<LoggerArg> = Array<LoggerArg>,
-  // appender configs
+  // logWriter configs
   CA extends Record<string, any> = Record<string, any>,
-  // Data accepted by appender
+  // Data accepted by logWriter
   DA = any,
   // Context
   CO extends Record<string, any> = Record<string, any>,
 > = (
   data: D,
   options: {
-    appenderConfig: CA
+    logWriterConfig: CA
     context: CO
     loggerName: string
     level: Level<T>
@@ -96,9 +96,9 @@ export type LoggerProps<TLevelName extends LevelName | CustomLevel, TName extend
   loggerName: TName
 
   /**
-   * controls what messages will be sent to appenders using message severity
+   * controls what messages will be sent to log writers using message severity
    *
-   * Once requests are sent, they are received by appenders using Appender - Logger - Level mapping (see Appender.attachToLogger function)
+   * Once requests are sent, they are received by log writers using LogWriter - Logger - Level mapping (see LogWriter.attachToLogger function)
    */
   level: LevelParam<TLevelName>
 

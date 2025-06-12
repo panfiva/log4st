@@ -11,10 +11,10 @@ Key differences:
 
 ## Sample App
 
-In this example, `numberLogger` and `logger` share appender `testFileAppender`.
+In this example, `numberLogger` and `logger` share logWriter `testFileLogWriter`.
 Loggers define different data types that log functions will accept.
 
-To activate message listeners, we use `<appender>.attachToLogger` function.
+To activate message listeners, we use `<LogWriter>.attachToLogger` function.
 
 Process listeners (`process.on`) illustrate how to handle errors.
 
@@ -22,11 +22,11 @@ Process listeners (`process.on`) illustrate how to handle errors.
 import debugLib from 'debug'
 const debug = debugLib('log4ts:app')
 
-import { getLevelRegistry, createLogger, FileAppender, shutdown, LevelName } from 'log4ts'
+import { getLevelRegistry, createLogger, FileLogWriter, shutdown, LevelName } from 'log4ts'
 
 type LevelNames = LevelName | 'TEST'
 type LoggerNames = 'NumberListLogger' | 'StringLogger'
-type AppenderNames = 'TestFileAppender'
+type LogWriterNames = 'TestFileLogWriter'
 
 // Logger will accept one or more number
 type NumberListLoggerData = number[]
@@ -41,33 +41,33 @@ levelRegistry.addLevels({
   TEST: { value: 20001, color: 'green' },
 })
 
-const testFileAppender = new FileAppender<AppenderNames>('TestFileAppender', {
+const testFileLogWriter = new FileLogWriter<LogWriterNames>('TestFileLogWriter', {
   filename: './logs/test.txt',
   backups: 3,
   maxLogSize: 1024, // size in bytes
   mode: 0o644,
 })
 
-// create link Logger (event generator) - Appender (event writer) - Level
-testFileAppender.attachToLogger<LoggerNames, LevelNames, NumberListLoggerData>(
+// create link Logger (event generator) - LogWriter (event writer) - Level
+testFileLogWriter.attachToLogger<LoggerNames, LevelNames, NumberListLoggerData>(
   'NumberListLogger',
   'DEBUG',
-  (event, appenderName, appenderConfig) => {
+  (event, logWriterName, logWriterConfig) => {
     return (
-      `${event.payload.level}: ${event.payload.loggerName}: ${appenderName}:` +
-      ` ${appenderConfig.filename}: ${event.payload.data.join(', ')}`
+      `${event.payload.level}: ${event.payload.loggerName}: ${logWriterName}:` +
+      ` ${logWriterConfig.filename}: ${event.payload.data.join(', ')}`
     )
   }
 )
 
-// create link Logger (event generator) - Appender (event writer) - Level
-testFileAppender.attachToLogger<LoggerNames, LevelNames, LoggerData>(
+// create link Logger (event generator) - LogWriter (event writer) - Level
+testFileLogWriter.attachToLogger<LoggerNames, LevelNames, LoggerData>(
   'StringLogger',
   'DEBUG',
-  (event, appenderName, appenderConfig) => {
+  (event, logWriterName, logWriterConfig) => {
     return (
-      `${event.payload.level}: ${event.payload.loggerName}: ${appenderName}: ` +
-      `${appenderConfig.filename}: ${event.payload.data.join(' - ')}`
+      `${event.payload.level}: ${event.payload.loggerName}: ${logWriterName}: ` +
+      `${logWriterConfig.filename}: ${event.payload.data.join(' - ')}`
     )
   }
 )
@@ -133,21 +133,21 @@ setTimeout(() => {
 setTimeout(() => {}, 30 * 1000)
 ```
 
-## Sample Appender
+## Sample LogWriter
 
 ```ts
-import { Appender, ShutdownCb } from 'log4ts'
+import { LogWriter, ShutdownCb } from 'log4ts'
 
 import debugLib from 'debug'
-const debug = debugLib('log4ts:appender:example')
+const debug = debugLib('log4ts:logWriter:example')
 
-export type ExampleAppenderConfig = { example: string }
+export type ExampleLogWriterConfig = { example: string }
 
-export class ExampleAppender<
+export class ExampleLogWriter<
   TFormattedData,
   TConfigA extends Record<string, any>,
   TNameA extends string,
-> extends Appender<TFormattedData, TConfigA, TNameA> {
+> extends LogWriter<TFormattedData, TConfigA, TNameA> {
   config: TConfigA
 
   constructor(name: TNameA, config: TConfigA) {
@@ -155,7 +155,7 @@ export class ExampleAppender<
 
     this.config = config
 
-    debug(`Creating example appender ${JSON.stringify(this.config)}`)
+    debug(`Creating example logWriter ${JSON.stringify(this.config)}`)
   }
 
   write = (data: TFormattedData) => {

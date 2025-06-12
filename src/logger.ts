@@ -76,7 +76,7 @@ class LoggerClass<
   /** logger name */
   loggerName: TName
 
-  /** default log level for attached appenders */
+  /** default log level for attached log writers */
   private _level: Level<TLevelName>
 
   /** indicates if callstack should be recorded  */
@@ -159,7 +159,7 @@ class LoggerClass<
   }
 
   private _log(level: LevelParam<TLevelName>, data: TData) {
-    debug(`sending log data (${level}) to appenders`)
+    debug(`sending log data (${level}) to log writers`)
     const error = data.find((item) => item instanceof Error)
     let callStack
     if (this.useCallStack) {

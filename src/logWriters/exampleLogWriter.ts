@@ -1,15 +1,15 @@
-import { Appender, ShutdownCb } from '../appenderClass'
+import { LogWriter, ShutdownCb } from '../logWriterClass'
 
 import debugLib from 'debug'
-const debug = debugLib('log4ts:appender:example')
+const debug = debugLib('log4ts:logWriter:example')
 
-export type ExampleAppenderConfig = { example: string }
+export type ExampleLogWriterConfig = { example: string }
 
-export class ExampleAppender<
+export class ExampleLogWriter<
   TFormattedData,
   TConfigA extends Record<string, any>,
   TNameA extends string,
-> extends Appender<TFormattedData, TConfigA, TNameA> {
+> extends LogWriter<TFormattedData, TConfigA, TNameA> {
   config: TConfigA
 
   constructor(name: TNameA, config: TConfigA) {
@@ -17,7 +17,7 @@ export class ExampleAppender<
 
     this.config = config
 
-    debug(`Creating example appender ${JSON.stringify(this.config)}`)
+    debug(`Creating example logWriter ${JSON.stringify(this.config)}`)
   }
 
   write = (data: TFormattedData) => {

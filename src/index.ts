@@ -1,10 +1,10 @@
-export { Appender, ShutdownCb } from './appenderClass'
-export { FileAppender, FileAppenderConfig } from './appenders/fileAppender'
+export { LogWriter, ShutdownCb } from './logWriterClass'
+export { FileLogWriter, FileLogWriterConfig } from './logWriters/fileLogWriter'
 export {
-  SplunkHecAppender,
-  SplunkHecAppenderConfig,
+  SplunkHecLogWriter,
+  SplunkHecLogWriterConfig,
   SplunkData,
-} from './appenders/splunkHecAppender'
+} from './logWriters/splunkHecLogWriter'
 export { createLogger, Logger } from './logger'
 export { getLevelRegistry } from './level'
 export type * from './types'

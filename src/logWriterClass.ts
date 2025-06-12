@@ -10,23 +10,23 @@ export type ShutdownCb = ((e?: Error) => void) | ((e?: Error) => Promise<void>)
 /**
  * class that writes logs to the destination repository
  */
-export abstract class Appender<
-  // data shape that appender accepts
+export abstract class LogWriter<
+  // data shape that logWriter accepts
   TFormattedData,
-  // appender config parameters
+  // logWriter config parameters
   TConfigA extends Record<string, any>,
   TNameA extends string,
 > {
   name: TNameA
 
-  /** appender configurations */
+  /** logWriter configurations */
   abstract config: TConfigA
 
   constructor(name: TNameA) {
     this.name = name
   }
 
-  /** function executed on appender shutdown */
+  /** function executed on logWriter shutdown */
   shutdown: (cb?: ShutdownCb) => Promise<void> | void = (cb) => {
     if (cb) cb()
   }
@@ -39,21 +39,21 @@ export abstract class Appender<
     loggerName: TLoggerName,
 
     /**
-     * controls what appenders will receive message sent by a logger
+     * controls what low writers will receive message sent by a logger
      *
-     * this is different from Logger.level property that controls what messages are sent to appenders
+     * this is different from Logger.level property that controls what messages are sent to log writers
      */
     levelName: TLevelName,
 
-    /** callback function that transforms event payload to format accepted by appender  */
+    /** callback function that transforms event payload to format accepted by logWriter  */
     transformer: (
       event: LoggingEvent<TLevelName, TData>,
-      appenderName: TNameA,
-      appenderConfig: TConfigA
+      logWriterName: TNameA,
+      logWriterConfig: TConfigA
     ) => TFormattedData
   ): void => {
     const listener = function (
-      this: Appender<TFormattedData, TConfigA, TNameA>,
+      this: LogWriter<TFormattedData, TConfigA, TNameA>,
       event: LoggingEvent<TLevelName, TData>
     ) {
       const data = transformer(event, this.name, this.config)
@@ -65,7 +65,7 @@ export abstract class Appender<
         loggerName,
         levelName,
         listener,
-        appender: this,
+        logWriter: this,
       })
     })
   }
