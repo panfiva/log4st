@@ -47,14 +47,14 @@ export abstract class Appender<
 
     /** callback function that transforms event payload to format accepted by appender  */
     transformer: (
-      event: LoggingEvent<TLoggerName, TData>,
+      event: LoggingEvent<TLevelName, TData>,
       appenderName: TNameA,
       appenderConfig: TConfigA
     ) => TFormattedData
   ): void => {
     const listener = function (
       this: Appender<TFormattedData, TConfigA, TNameA>,
-      event: LoggingEvent<TLoggerName, TData>
+      event: LoggingEvent<TLevelName, TData>
     ) {
       const data = transformer(event, this.name, this.config)
       this.write(data)
