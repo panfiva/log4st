@@ -5,21 +5,21 @@ import type { Level } from 'level'
 
 import { pick, omitBy } from 'lodash'
 
-const deserialise = {
+const deserialize = {
   '__LOG4JS_undefined__': undefined,
   '__LOG4JS_NaN__': Number('abc'),
   '__LOG4JS_Infinity__': 1 / 0,
   '__LOG4JS_-Infinity__': -1 / 0,
 }
 
-type TdeMap = typeof deserialise
+type TdeMap = typeof deserialize
 
-class SerDe {
-  deMap: TdeMap = deserialise
+class Serializer {
+  deMap: TdeMap = deserialize
   serMap: Map<any, any>
 
   constructor() {
-    this.deMap = deserialise
+    this.deMap = deserialize
     this.serMap = new Map<any, any>()
     Object.keys(this.deMap).forEach((key) => {
       const value = this.deMap[key as keyof TdeMap]
@@ -27,7 +27,7 @@ class SerDe {
     })
   }
 
-  canSerialise(key: any) {
+  canSerialize(key: any) {
     if (typeof key === 'string') return false
     try {
       return this.serMap.has(key)
@@ -36,21 +36,21 @@ class SerDe {
     }
   }
 
-  serialise(key: any) {
-    if (this.canSerialise(key)) return this.serMap.get(key)
+  serialize(key: any) {
+    if (this.canSerialize(key)) return this.serMap.get(key)
     return key
   }
 
-  canDeserialise(key: any) {
+  canDeserialize(key: any) {
     return key in this.deMap
   }
 
-  deserialise(key: any) {
-    if (this.canDeserialise(key)) return this.deMap[key as keyof TdeMap]
+  deserialize(key: any) {
+    if (this.canDeserialize(key)) return this.deMap[key as keyof TdeMap]
     return key
   }
 }
-const serde = new SerDe()
+const serializer = new Serializer()
 
 type LoggingEventProps<T extends LevelName, TData extends Array<LoggerArg>> = {
   loggerName: string
@@ -123,7 +123,7 @@ export class LoggingEvent<TLevelName extends LevelName, TData extends Array<Logg
     return locationKeys
   }
 
-  serialise() {
+  serialize() {
     return flatted.stringify(this, (_key, value) => {
       // JSON.stringify(new Error('test')) returns {}, which is not really useful for us.
       // The following allows us to serialize errors (semi) correctly.
@@ -137,22 +137,22 @@ export class LoggingEvent<TLevelName extends LevelName, TData extends Array<Logg
       // The following allows us to serialize to NaN, Infinity and -Infinity correctly.
       // JSON.stringify([undefined]) returns [null].
       // The following allows us to serialize to undefined correctly.
-      return serde.serialise(v)
+      return serializer.serialize(v)
     })
   }
 
-  static deserialise(serialised: any) {
+  static deserialize(serialized: any) {
     let event: LoggingEvent<any, any>
     try {
-      const rehydratedEvent = flatted.parse(serialised, (key, value) => {
+      const rehydratedEvent = flatted.parse(serialized, (key, value) => {
         if (value && value.message && value.stack) {
           const fakeError = new Error(value)
           Object.keys(value).forEach((k) => {
             fakeError[k as keyof Error] = value[k]
           })
-          return serde.deserialise(value)
+          return serializer.deserialize(value)
         }
-        return serde.deserialise(value)
+        return serializer.deserialize(value)
       })
       LoggingEvent.getLocationKeys().forEach((key) => {
         if (typeof rehydratedEvent[key] !== 'undefined') {
@@ -180,7 +180,7 @@ export class LoggingEvent<TLevelName extends LevelName, TData extends Array<Logg
       event = new LoggingEvent({
         loggerName: 'log4ts',
         level: 'ERROR',
-        data: ['Unable to parse log:', serialised, 'because: ', e],
+        data: ['Unable to parse log:', serialized, 'because: ', e],
       })
     }
 

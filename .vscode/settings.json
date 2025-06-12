@@ -40,5 +40,6 @@
   "editor.wordBasedSuggestions": "off",
   "editor.suggest.showSnippets": false,
   "eslint.useFlatConfig": true,
-  "eslint.validate": ["javascript", "typescript"]
+  "eslint.validate": ["javascript", "typescript"],
+  "cSpell.words": ["allexport", "appender", "deserialize", "listeners", "multiprocess", "serialize"]
 }

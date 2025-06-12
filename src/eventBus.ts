@@ -64,7 +64,7 @@ class EventBus {
 
   cluster: Cluster | false
 
-  /**  indicates if messessage sending is disabled */
+  /**  indicates if message sending is disabled */
   enabled: boolean = true
 
   constructor() {
@@ -97,7 +97,7 @@ class EventBus {
     return (this.cluster && this.cluster.isPrimary) || !this.cluster
   }
 
-  private sendToLlisteners = (logEvent: LoggingEvent<any, any>) => {
+  private sendToListeners = (logEvent: LoggingEvent<any, any>) => {
     if (!this.enabled) return
 
     const listeners = this.listeners.filter(
@@ -117,14 +117,14 @@ class EventBus {
     //   worker = undefined
     // }
     // if (message && message.topic === 'log4ts:message') {
-    //   const logEvent = LoggingEvent.deserialise(message.data)
-    //   this.sendToLlisteners(logEvent)
+    //   const logEvent = LoggingEvent.deserialize(message.data)
+    //   this.sendToListeners(logEvent)
     // }
   }
 
   public send(msg: LoggingEvent<any, any>) {
     if (this.isMaster()) {
-      this.sendToLlisteners(msg)
+      this.sendToListeners(msg)
     }
     // if workers are used in multiprocess environment
     else {
@@ -132,7 +132,7 @@ class EventBus {
       //     workerId: cluster.worker.id,
       //     worker: process.pid,
       //   };
-      process.send?.({ topic: 'log4ts:message', data: msg.serialise() })
+      process.send?.({ topic: 'log4ts:message', data: msg.serialize() })
     }
   }
 

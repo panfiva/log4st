@@ -77,6 +77,6 @@ export type RollingFileWriteStreamOptions = {
 
   encoding?: BufferEncoding
 
-  /** File name separater */
+  /** File name separator */
   fileNameSep?: string
 }

@@ -1,5 +1,5 @@
 import debugLib from 'debug'
-const debug = debugLib('streamroller:moveFile')
+const debug = debugLib('log4ts:moveFile')
 
 import * as fs from 'fs-extra'
 import * as zlib from 'zlib'

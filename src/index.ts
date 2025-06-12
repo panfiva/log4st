@@ -1,4 +1,4 @@
-export { Appender } from './appenderClass'
+export { Appender, ShutdownCb } from './appenderClass'
 export { FileAppender, FileAppenderConfig } from './appenders/fileAppender'
 export { createLogger, Logger } from './logger'
 export { getLevelRegistry } from './level'

@@ -79,7 +79,7 @@ class LevelRegistry<T extends LevelName = LevelName> {
       return level as Level<T>
     }
 
-    // a json-serialised level won't be an instance of Level
+    // a json-serialized level won't be an instance of Level
     if (level instanceof Object) {
       const levelName = level.levelName.toUpperCase() as T
 

@@ -5,7 +5,7 @@ import * as path from 'path'
 import * as os from 'os'
 
 import debugLib from 'debug'
-const debug = debugLib('log4ts:file')
+const debug = debugLib('log4ts:appender:file')
 
 const eol = os.EOL
 
