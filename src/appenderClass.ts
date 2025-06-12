@@ -5,7 +5,7 @@ import { getEventBus } from './eventBus'
 
 type WriteMethod<D> = (data: D) => Promise<void> | void
 
-export type ShutdownCb = (() => void) | (() => Promise<void>)
+export type ShutdownCb = ((e?: Error) => void) | ((e?: Error) => Promise<void>)
 
 /**
  * class that writes logs to the destination repository
@@ -57,7 +57,6 @@ export abstract class Appender<
       event: LoggingEvent<TLoggerName, TData>
     ) {
       const data = transformer(event, this.name, this.config)
-
       this.write(data)
     }.bind(this)
 
@@ -66,6 +65,7 @@ export abstract class Appender<
         loggerName,
         levelName,
         listener,
+        appender: this,
       })
     })
   }

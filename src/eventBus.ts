@@ -4,6 +4,7 @@ const debug = debugLib('log4ts:clustering')
 import { Worker, Cluster } from 'cluster'
 import type { LoggingEvent } from './loggingEvent'
 import type { LevelName } from './types'
+import type { Appender, ShutdownCb } from './appenderClass'
 
 let _cluster: Cluster | false | undefined = undefined
 let _eventBus: EventBus | undefined = undefined
@@ -50,13 +51,21 @@ export async function getEventBus(): Promise<EventBus> {
   return await _promise
 }
 
+export async function shutdown(callback?: ShutdownCb): Promise<void> {
+  const eventBus = await getEventBus()
+
+  return eventBus.shutdown(callback)
+}
+
 class EventBus {
   private listeners: EventListenerConfig<any, any>[] = []
 
+  private appenders: Map<string, Appender<any, any, any>> = new Map()
+
   cluster: Cluster | false
 
-  /**  indicates if clustering is disabled or enabled */
-  private disabled: boolean = false
+  /**  indicates if messessage sending is disabled */
+  enabled: boolean = true
 
   constructor() {
     // at this point, _cluster is populated with EventBus or false
@@ -75,7 +84,6 @@ class EventBus {
         debug('only primary cluster can subscribe to messages')
       }
     } else {
-      this.disabled = true
       this.cluster = false
     }
   }
@@ -90,6 +98,8 @@ class EventBus {
   }
 
   private sendToLlisteners = (logEvent: LoggingEvent<any, any>) => {
+    if (!this.enabled) return
+
     const listeners = this.listeners.filter(
       (v) =>
         v.loggerName === logEvent.payload.loggerName &&
@@ -127,8 +137,49 @@ class EventBus {
   }
 
   /** adds message listener */
-  public addMessageListener(conf: EventListenerConfig<any, any>) {
-    this.listeners.push(conf)
-    return
+  public addMessageListener(
+    conf: EventListenerConfig<any, any> & { appender: Appender<any, any, any> }
+  ) {
+    const { appender, levelName, listener, loggerName } = conf
+    this.listeners.push({ levelName, listener, loggerName })
+    const registered = this.appenders.get(conf.appender.name)
+    if (registered && registered !== appender) {
+      throw new Error('Duplicate appender name detected')
+    }
+    this.appenders.set(conf.appender.name, appender)
+  }
+
+  public async shutdown(callback?: ShutdownCb) {
+    debug('Shutdown called. Disabling all log writing.')
+
+    this.enabled = false
+
+    // count of appenders
+
+    const appendersToCheck = Array.from(this.appenders.values())
+
+    const appenders = appendersToCheck.length
+
+    if (appenders === 0) {
+      debug('No appenders to shutdown')
+      if (callback) callback()
+    }
+
+    let completed: number = 0
+    let error: Error | undefined = undefined
+
+    debug(`Found ${appenders} appenders to shutdown`)
+
+    async function complete(err?: Error) {
+      error = error ?? err
+      completed += 1
+      debug(`Appender shutdowns complete: ${completed} / ${appenders}`)
+      if (completed >= appenders) {
+        debug('All shutdown functions completed.')
+        if (callback) callback(error)
+      }
+    }
+
+    appendersToCheck.forEach((v) => v.shutdown(complete))
   }
 }
