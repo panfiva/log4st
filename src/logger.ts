@@ -2,7 +2,7 @@ import debugLib from 'debug'
 const debug = debugLib('log4ts:logger')
 
 import { LoggingEvent } from './loggingEvent'
-import type { LevelParam, LevelName, LoggerArg, LoggerProps } from './types'
+import type { LevelParam, LevelName, LoggerArg, LoggerProps, CustomLevel } from './types'
 import type { Level } from './level'
 import { getLevelRegistry } from './level'
 import { getEventBus } from './eventBus'
@@ -19,16 +19,16 @@ const defaultErrorCallStackSkip = 3
 
 type LoggerFunction<D extends Array<LoggerArg>> = (...params: D) => void
 
-type LoggerMethods<T extends LevelName, D extends Array<LoggerArg>> = Record<
+type LoggerMethods<T extends LevelName | CustomLevel, D extends Array<LoggerArg>> = Record<
   LoggerMethodName<T>,
   LoggerFunction<D>
 >
 
-type LoggerMethodName<T extends LevelName> = Lowercase<T>
+type LoggerMethodName<T extends LevelName | CustomLevel> = Lowercase<T>
 
 export const createLogger = <
   TData extends Array<LoggerArg>,
-  TLevelName extends LevelName,
+  TLevelName extends LevelName | CustomLevel,
   TName extends string,
 >(
   param: LoggerProps<TLevelName, TName>
@@ -60,7 +60,7 @@ export const createLogger = <
 }
 
 export type Logger<
-  TLevelName extends LevelName,
+  TLevelName extends LevelName | CustomLevel,
   TData extends Array<LoggerArg>,
   TName extends string,
 > = LoggerClass<TLevelName, TData, TName> & LoggerMethods<TLevelName, TData>
@@ -69,7 +69,7 @@ export type Logger<
  * Logger to log messages.
  */
 class LoggerClass<
-  TLevelName extends LevelName,
+  TLevelName extends LevelName | CustomLevel,
   TData extends Array<LoggerArg>,
   TName extends string,
 > {

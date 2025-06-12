@@ -1,4 +1,4 @@
-import type { LevelName, LoggerArg } from './types'
+import type { LevelName, LoggerArg, CustomLevel } from './types'
 import type { LoggingEvent } from './loggingEvent'
 
 import { getEventBus } from './eventBus'
@@ -33,7 +33,7 @@ export abstract class Appender<
 
   attachToLogger = <
     TLoggerName extends string,
-    TLevelName extends LevelName,
+    TLevelName extends LevelName | CustomLevel,
     TData extends Array<LoggerArg>,
   >(
     loggerName: TLoggerName,

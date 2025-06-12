@@ -1,5 +1,5 @@
 import flatted from 'flatted'
-import type { LevelParam, LevelName, CallStack, LoggerArg } from './types'
+import type { LevelParam, LevelName, CallStack, LoggerArg, CustomLevel } from './types'
 import { getLevelRegistry } from './level'
 import type { Level } from 'level'
 
@@ -52,7 +52,7 @@ class Serializer {
 }
 const serializer = new Serializer()
 
-type LoggingEventProps<T extends LevelName, TData extends Array<LoggerArg>> = {
+type LoggingEventProps<T extends LevelName | CustomLevel, TData extends Array<LoggerArg>> = {
   loggerName: string
   level: LevelParam<T>
   /** objects to log */
@@ -70,7 +70,10 @@ type LoggingEventProps<T extends LevelName, TData extends Array<LoggerArg>> = {
   }
 }
 
-export class LoggingEvent<TLevelName extends LevelName, TData extends Array<LoggerArg>> {
+export class LoggingEvent<
+  TLevelName extends LevelName | CustomLevel,
+  TData extends Array<LoggerArg>,
+> {
   payload: Omit<LoggingEventProps<TLevelName, TData>, 'level'> & {
     startTime: Date
     level: Level<TLevelName>

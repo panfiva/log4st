@@ -11,7 +11,6 @@ export type LevelName =
   | 'ALL'
   | 'MARK'
   | 'OFF'
-  | CustomLevel
 
 export type ValidColors =
   | 'white'
@@ -25,9 +24,9 @@ export type ValidColors =
   | 'yellow'
 
 /** this type is a string type; NonNullable<unknown> is added so that autocomplete works for LevelName items */
-type CustomLevel = string & NonNullable<unknown>
+export type CustomLevel = string & NonNullable<unknown>
 
-export type LevelParam<T extends LevelName = LevelName> =
+export type LevelParam<T extends LevelName | CustomLevel = LevelName> =
   | T
   | Level<T>
   | { level: number; levelName: T; color: ValidColors }
@@ -37,7 +36,7 @@ export type LevelParam<T extends LevelName = LevelName> =
  *
  * Do not use for passing level information between different functions and methods; use `LevelParam` instead
  */
-export type LevelConstructorProps<T extends LevelName = LevelName> = Record<
+export type LevelConstructorProps<T extends LevelName | CustomLevel = LevelName> = Record<
   T,
   { value: number; color: ValidColors }
 >
@@ -92,7 +91,7 @@ export type TransformerFn<
   }
 ) => DA
 
-export type LoggerProps<TLevelName extends LevelName, TName extends string> = {
+export type LoggerProps<TLevelName extends LevelName | CustomLevel, TName extends string> = {
   /** logger name */
   loggerName: TName
 

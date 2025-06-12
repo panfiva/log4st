@@ -1,6 +1,12 @@
-import type { LevelName, ValidColors, LevelParam, LevelConstructorProps } from './types'
+import type {
+  LevelName,
+  ValidColors,
+  LevelParam,
+  LevelConstructorProps,
+  CustomLevel,
+} from './types'
 
-export class Level<TLevelName extends LevelName = LevelName> {
+export class Level<TLevelName extends LevelName | CustomLevel = LevelName> {
   level: number
   levelName: TLevelName
   color: ValidColors
@@ -40,7 +46,7 @@ export class Level<TLevelName extends LevelName = LevelName> {
   }
 }
 
-class LevelRegistry<T extends LevelName = LevelName> {
+class LevelRegistry<T extends LevelName | CustomLevel = LevelName> {
   levelsDict: Record<T, Level<T>> = {} as any // constructor will
   levelsArray: Array<Level<T>> = []
 
@@ -115,6 +121,8 @@ class LevelRegistry<T extends LevelName = LevelName> {
 
 const levelRegistry = new LevelRegistry()
 
-export function getLevelRegistry<T extends LevelName = LevelName>(): LevelRegistry<T> {
+export function getLevelRegistry<
+  T extends LevelName | CustomLevel = LevelName,
+>(): LevelRegistry<T> {
   return levelRegistry as any
 }
