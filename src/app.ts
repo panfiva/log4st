@@ -30,6 +30,7 @@ const testFileAppender = new FileAppender<AppenderNames>('TestFileAppender', {
   mode: 0o644,
 })
 
+// create link Logger (event generator) - Appender (event writer) - Level
 testFileAppender.attachToLogger<LoggerNames, LevelNames, NumberListLoggerData>(
   'NumberListLogger',
   'DEBUG',
@@ -38,6 +39,7 @@ testFileAppender.attachToLogger<LoggerNames, LevelNames, NumberListLoggerData>(
   }
 )
 
+// create link Logger (event generator) - Appender (event writer) - Level
 testFileAppender.attachToLogger<LoggerNames, LevelNames, LoggerData>(
   'StringLogger',
   'DEBUG',
@@ -56,7 +58,7 @@ const logger = createLogger<LoggerData, LevelNames, LoggerNames>({
   level: 'DEBUG',
 })
 
-function handleExit(reason: 'SIGINT' | 'SIGTERM' | 'uncaughtException' | 'unhandledRejection') {
+const handleExit = (reason: 'SIGINT' | 'SIGTERM' | 'uncaughtException' | 'unhandledRejection') => {
   if (['uncaughtException', 'unhandledRejection'].includes(reason)) {
     logger.fatal(`exit signal: ${reason}`)
   } else {
@@ -73,19 +75,15 @@ process.on('unhandledRejection', (reason: Error) => {
   try {
     logger.fatal('process.on.unhandledRejection', reason)
   } catch (err) {
-    console.error(reason) // write as-is to console
+    console.error(reason)
   }
 
   handleExit('unhandledRejection')
 })
 
-process.on('SIGINT', function () {
-  handleExit('SIGINT')
-})
+process.on('SIGINT', () => handleExit('SIGINT'))
 
-process.on('SIGTERM', function () {
-  handleExit('SIGTERM')
-})
+process.on('SIGTERM', () => handleExit('SIGTERM'))
 
 process.on('uncaughtException', (err: Error, _origin: any) => {
   debug('process.on.uncaughtException')
@@ -93,17 +91,19 @@ process.on('uncaughtException', (err: Error, _origin: any) => {
   try {
     logger.fatal('process.on.uncaughtException', err, _origin)
   } catch (e) {
-    console.error(e) // write as-is to console
+    console.error(e)
   }
 
   handleExit('uncaughtException')
 })
 
 numberLogger.debug(1, 2, 3)
-logger.test('sample string')
+logger.test('sample string', 1, 2, 3)
 
+// trigger SIGINT
 setTimeout(() => {
   process.kill(process.pid, 'SIGINT')
 }, 2 * 1000)
 
+// keep the process running
 setTimeout(() => {}, 30 * 1000)
