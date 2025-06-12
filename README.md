@@ -53,7 +53,10 @@ testFileAppender.attachToLogger<LoggerNames, LevelNames, NumberListLoggerData>(
   'NumberListLogger',
   'DEBUG',
   (event, appenderName, appenderConfig) => {
-    return `${event.payload.level}: ${event.payload.loggerName}: ${appenderName}: ${appenderConfig.filename}: ${event.payload.data.join(', ')}`
+    return (
+      `${event.payload.level}: ${event.payload.loggerName}: ${appenderName}:` +
+      ` ${appenderConfig.filename}: ${event.payload.data.join(', ')}`
+    )
   }
 )
 
@@ -62,7 +65,10 @@ testFileAppender.attachToLogger<LoggerNames, LevelNames, LoggerData>(
   'StringLogger',
   'DEBUG',
   (event, appenderName, appenderConfig) => {
-    return `${event.payload.level}: ${event.payload.loggerName}: ${appenderName}: ${appenderConfig.filename}: ${event.payload.data.join(' - ')}`
+    return (
+      `${event.payload.level}: ${event.payload.loggerName}: ${appenderName}: ` +
+      `${appenderConfig.filename}: ${event.payload.data.join(' - ')}`
+    )
   }
 )
 
