@@ -106,10 +106,10 @@ process.on('uncaughtException', (err: Error, _origin: any) => {
 numberLogger.debug(1, 2, 3)
 logger.test('sample string', 1, 2, 3)
 
-// trigger SIGINT
+// trigger SIGINT - demo purposes only to illustrate how process.on handler work
 setTimeout(() => {
   process.kill(process.pid, 'SIGINT')
 }, 2 * 1000)
 
-// keep the process running
+// keep the process running - demo purposes keep process running for 30 seconds
 setTimeout(() => {}, 30 * 1000)

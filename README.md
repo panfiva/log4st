@@ -9,7 +9,7 @@ Key differences:
 - Do not use configuration to configure the project - instantiate class instances instead
 - Allows multiple loggers in a project
 
-## Example
+## Sample App
 
 In this example, `numberLogger` and `logger` share appender `testFileAppender`.
 Loggers define different data types that log functions will accept.
@@ -124,16 +124,16 @@ process.on('uncaughtException', (err: Error, _origin: any) => {
 numberLogger.debug(1, 2, 3)
 logger.test('sample string', 1, 2, 3)
 
-// trigger SIGINT
+// trigger SIGINT - demo purposes only to illustrate how process.on handler work
 setTimeout(() => {
   process.kill(process.pid, 'SIGINT')
 }, 2 * 1000)
 
-// keep the process running
+// keep the process running - demo purposes keep process running for 30 seconds
 setTimeout(() => {}, 30 * 1000)
 ```
 
-## ExampleAppender
+## Sample Appender
 
 ```ts
 import { Appender, ShutdownCb } from 'log4ts'
