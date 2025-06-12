@@ -1,3 +1,6 @@
+# Splunk HEC Appender usage example
+
+```ts
 import debugLib from 'debug'
 const debug = debugLib('log4ts:app')
 
@@ -92,7 +95,7 @@ const data: SplunkLoggerData = {
   message: 'ec2-workspace-create:success',
   refid: 'refid-string',
   status: 'success',
-  product: 'ezdemo:demo:360',
+  product: 'ezdemo:demo:ztna-next-360',
   product_family: 'ezdemo',
   action: 'create',
   user: 'user@domain.com',
@@ -101,7 +104,7 @@ const data: SplunkLoggerData = {
     messageId: 'messageId-102',
     executionId: 'executionId-103',
     resourceId: 'resourceId-104',
-    target: 'ec2-workspace-1749',
+    target: 'ec2-workspace-1749750526125',
   },
 }
 
@@ -156,3 +159,4 @@ function server() {
   // keep the process running - demo purposes keep process running for 30 seconds
   setTimeout(() => {}, 30 * 1000)
 }
+```
