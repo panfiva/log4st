@@ -41,5 +41,13 @@
   "editor.suggest.showSnippets": false,
   "eslint.useFlatConfig": true,
   "eslint.validate": ["javascript", "typescript"],
-  "cSpell.words": ["allexport", "appender", "deserialize", "listeners", "multiprocess", "serialize"]
+  "cSpell.words": [
+    "allexport",
+    "appender",
+    "deserialize",
+    "listeners",
+    "multiprocess",
+    "serialize",
+    "sourcetype"
+  ]
 }
