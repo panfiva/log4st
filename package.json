@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "prettier": "prettier --config ./.prettierrc.mjs --write --list-different \"src/**/*.{js,jsx,json,ts,tsx,css,md,jsonc,mjs,cjs}\"",
-    "start": "yarn build && tsc-watch --onSuccess \"node ./dist/app.js\"",
+    "start": "yarn build && bash -c 'set -e; [ -f .env ] && set -o allexport && source .env && set +o allexport; tsc-watch --onSuccess \"node ./dist/app.js\"'",
     "build": "tsc --build",
     "update": "npx npm-check-updates  --deep --upgrade",
     "upgrade": "yarn set version stable && rm -f yarn.lock && yarn install",
