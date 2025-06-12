@@ -16,13 +16,13 @@ export const defaultParseCallStack: ParseCallStackFunction = (
   try {
     if (!data.stack) return
 
-    const stacklines = data.stack.split('\n').slice(skipIdx)
-    if (!stacklines.length) {
+    const stackLines = data.stack.split('\n').slice(skipIdx)
+    if (!stackLines.length) {
       // There's no stack in this stack
       // Should we try a previous index if skipIdx was set?
       return
     }
-    const lineMatch = stackReg.exec(stacklines[0])
+    const lineMatch = stackReg.exec(stackLines[0])
     /* istanbul ignore else: failsafe */
     if (lineMatch && lineMatch.length === 5) {
       // extract class, function and alias names
@@ -41,7 +41,7 @@ export const defaultParseCallStack: ParseCallStackFunction = (
         fileName: lineMatch[2],
         lineNumber: parseInt(lineMatch[3], 10),
         columnNumber: parseInt(lineMatch[4], 10),
-        callStack: stacklines.join('\n'),
+        callStack: stackLines.join('\n'),
         className,
         functionName,
         functionAlias,
